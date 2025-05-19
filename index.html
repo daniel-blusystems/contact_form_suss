@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formular</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0fff0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group.required::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background-color: green;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Formular</h2>
+        <form id="requestForm">
+            <div class="form-group required">
+                <label for="orga">Firma</label>
+                <select id="orga" name="orga" required>
+                    <option value="" disabled selected>Bitte wählen</option>
+                    <option value="448074">Customer A</option>
+                    <option value="448075">Customer B</option>
+                    <option value="448076">Customer C</option>
+                </select>
+            </div>
+            <div class="form-group required">
+                <label for="product_line">Produktlinie</label>
+                <select id="product_line" name="product_line" required>
+                    <option value="" disabled selected>Bitte wählen</option>
+                    <option value="881074">Mask-Aligner</option>
+                    <option value="881075">Wafer-Bonder</option>
+                    <option value="881076">Inkjet</option>
+                </select>
+            </div>
+            <div class="form-group required">
+                <label for="ticket_category">Art der Anfrage</label>
+                <select id="ticket_category" name="ticket_category" required>
+                    <option value="" disabled selected>Bitte wählen</option>
+                    <option value="incident">Störung</option>
+                    <option value="rfc">Änderungsanfrage</option>
+                    <option value="rfi">Anfrage</option>
+                    <option value="other">Sonstiges</option>
+                </select>
+            </div>
+            <div class="form-group required">
+                <label for="name">Name des Antragstellers</label>
+                <input type="text" id="name" name="name" maxlength="250" required>
+            </div>
+            <div class="form-group required">
+                <label for="mail">E-Mail Adresse des Antragstellers</label>
+                <input type="email" id="mail" name="mail" required>
+            </div>
+            <div class="form-group required">
+                <label for="subject">Betreff</label>
+                <input type="text" id="subject" name="subject" maxlength="250" required>
+            </div>
+            <div class="form-group required">
+                <label for="description">Beschreibung</label>
+                <textarea id="description" name="description" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="serial">Seriennummer</label>
+                <input type="text" id="serial" name="serial" maxlength="250">
+            </div>
+            <button type="submit" class="submit-btn">Anfrage absenden</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('requestForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var form = event.target;
+            var data = {
+                mail: form.mail.value,
+                ticket_category: form.ticket_category.value,
+                name: form.name.value,
+                serial: form.serial.value,
+                subject: form.subject.value,
+                description: form.description.value,
+                orga: parseInt(form.orga.value),
+                product_line: parseInt(form.product_line.value)
+            };
+            fetch('https://prod-224.westeurope.logic.azure.com:443/workflows/2ceeeeb4c2e44b8b813ae142ce474ac6/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cIBTEJXwxW8pAZmSEz72YrAq2JohtMgCo1mVABsHbK8', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (response.ok) {
+                    alert('Anfrage erfolgreich gesendet!');
+                    form.reset();
+                } else {
+                    alert('Fehler beim Senden der Anfrage.');
+                }
+            }).catch(error => {
+                alert('Fehler beim Senden der Anfrage.');
+            });
+        });
+    </script>
+</body>
+</html>
